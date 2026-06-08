@@ -1,5 +1,9 @@
+/*  __________________  | This code was modified off the original	  */
+/*   S |-| - D - \/\/ 	|  Copyright [2026] [S𝔥𝔞⁽ᵃʰⁱ⁾d M𝔞𝔥𝔬𝔪𝔢ᵈ]      */
+/*  ==================	|      under Apache 2.0 License				      */
 
-// Note this is just the math breakthrough
+// Note: this is just the math breakthrough for the kinematics
+//       relativity formula by Shaahid Mahomed.
 
   BABYLON.Effect.ShadersStore["customVertexShader"]= `\r\n   
       precision highp float;\r\n      
