@@ -1,0 +1,215 @@
+
+// Note this is just the math breakthrough
+
+  BABYLON.Effect.ShadersStore["customVertexShader"]= `\r\n   
+      precision highp float;\r\n      
+
+      attribute vec3 position;\r\n
+      attribute vec3 scaling;\r\n
+      attribute vec3 rotation;\r\n
+
+      uniform mat4 worldViewProjection;\r\n
+      uniform vec3    uPositions[16];\r\n
+      uniform vec3    uRotations[16];\r\n
+      uniform vec3    uScales[16];\r\n
+      uniform int     uActiveCount;\r\n
+\r\n
+      vec3 rotatexyz(vec3 M, vec3 c, float beta, float theta, float phi) {\r\n
+        // Rotation matrix coefficients\r\n // vec3 center\r\n
+        float	ct, st;\r\n
+        float		x;\r\n
+        float		y;\r\n
+        float		z;\r\n
+\r\n
+        //x\r\n
+        x = M.x;\r\n
+        y = M.y;\r\n
+        z = M.z;\r\n
+        ct = cos(phi);\r\n
+        st = sin(phi);\r\n
+        M.x = ct * (x - c.x) - st * (y - c.y) + c.x;\r\n
+        M.y = st * (x - c.x) + ct * (y - c.y) + c.y;\r\n
+\r\n
+        //y\r\n
+        x = M.x;\r\n
+        y = M.y;\r\n
+        z = M.z;\r\n
+        ct = cos(theta);\r\n
+        st = sin(theta);\r\n
+        M.y = ct * (y - c.y) - st * (z - c.z) + c.y;\r\n
+        M.z = st * (y - c.y) + ct * (z - c.z) + c.z;\r\n
+\r\n
+        //z\r\n
+        x = M.x;\r\n
+        y = M.y;\r\n
+        z = M.z;\r\n
+        ct = cos(-beta);\r\n
+        st = sin(-beta);\r\n
+        M.x = ct * (x - c.x) - st * (z - c.z) + c.x;\r\n
+        M.z = st * (x - c.x) + ct * (z - c.z) + c.z;\r\n
+\r\n
+        return M;\r\n
+      }\r\n
+\r\n
+    vec3 recurRotateAroundParentRotationAsCenter(vec3 result, vec3 parent, vec3 rotateAmount, bool hasParent) {
+      if (hasParent) {
+        result = vec3(result.x + parent.x, result.y + parent.y, result.z + parent.z);
+        result = rotatexyz(result, parent, rotateAmount.x, rotateAmount.y, rotateAmount.z);
+      }
+
+      result.x = result.x;// + (hasParent ? parent.x : 0.0);
+      result.y = result.y;// + (hasParent ? parent.y : 0.0);
+      result.z = result.z;// + (hasParent ? parent.z : 0.0);
+      return result;
+    }
+
+     void main(void) {\r\n
+\r\n
+      vec3 finalPos = vec3(0.0, 0.0, 0.0);\r\n
+      vec3 finalRotPos = vec3(0.0, 0.0, 0.0);\r\n
+      vec3 parent = vec3(uPositions[uActiveCount - 1].x, uPositions[uActiveCount - 1].y, uPositions[uActiveCount - 1].z);\r\n
+      int i = -1;\r\n
+
+      vec3 rsum = vec3(0.0, 0.0, 0.0);\r\n
+      vec3 pos = position;\r\n
+      vec3 rot = rotation;
+      vec3 sca = scaling;
+      vec3 result = vec3(pos.x, pos.y, pos.z);\r\n
+
+
+    vec3 parentRot = vec3(0.0, 0.0, 0.0);
+    if (uActiveCount - 1 > 0) {
+      i = -1;// inverse L problem rectify from right order?
+      parent = uPositions[ i ];
+      // result = vec3(pos.x, pos.y, pos.z);
+      result = vec3(uPositions[0].x + pos.x, uPositions[0].y + pos.y, uPositions[0].z + pos.z);
+      result = rotatexyz(result, vec3(uPositions[0].x, uPositions[0].y, uPositions[0].z), uRotations[0].x, uRotations[0].y, uRotations[0].z);
+      while (++i < uActiveCount - 1) {
+          parent = uPositions[ i + 1 ];
+          parentRot = vec3(uRotations[ i + 1 ].x, uRotations[ i + 1 ].y, uRotations[ i + 1 ].z);
+          result = recurRotateAroundParentRotationAsCenter(result, parent, parentRot, true);
+      }
+      finalPos = result;
+
+    } else {
+
+      parent = vec3(uPositions[uActiveCount - 1].x, uPositions[uActiveCount - 1].y, uPositions[uActiveCount - 1].z);
+      if (uActiveCount - 1 > 0) {
+         result = vec3(uPositions[0].x + pos.x + (uActiveCount - 1 > 0 ? parent.x : 0.0),
+          uPositions[0].y + pos.y + (uActiveCount - 1 > 0 ? parent.y : 0.0),
+          uPositions[0].z + pos.z + (uActiveCount - 1 > 0 ? parent.z : 0.0));
+         result = rotatexyz(result, vec3(parent.x, parent.y, parent.z), uRotations[uActiveCount - 1].x, 0.0, 0.0);
+      } else {
+        result = vec3(uPositions[0].x + pos.x, uPositions[0].y + pos.y, uPositions[0].z + pos.z);
+        result = rotatexyz(result, vec3(uPositions[0].x, uPositions[0].y, uPositions[0].z), uRotations[0].x, uRotations[0].y, uRotations[0].z);
+      }
+      finalPos.x = result.x;
+      finalPos.y = result.y;
+      finalPos.z = result.z;
+    }
+
+
+  \r\n
+
+      vec3 finalScale = vec3(1.0, 1.0, 1.0);
+      i = -1;
+      while (++i < uActiveCount) {// rather not loop so many times but okay.
+        if (uScales[i].x == 0.0 || uScales[i].y == 0.0 || uScales[i].z == 0.0) {
+        } else {
+          finalScale.x *= uScales[i].x;
+          finalScale.y *= uScales[i].y;
+          finalScale.z *= uScales[i].z;
+        }
+      }
+
+      gl_Position = worldViewProjection * vec4(finalPos, 1.0) * vec4(finalScale, 1.0);
+      
+      }\r\n`;
+  BABYLON.Effect.ShadersStore["customFragmentShader"]="\r\n"+
+      "precision highp float;\r\n" +
+      "uniform vec3 myColor;\r\n" +
+      "void main(void) {\r\n" +
+      "   gl_FragColor = vec4(myColor.x, myColor.y, myColor.z, 0.5);\r\n" +
+  "}\r\n";
+
+
+
+var shaderMaterial = new BABYLON.ShaderMaterial("shader", scene, {
+      vertex: "custom",
+      fragment: "custom",
+      },
+      {
+        attributes: ["position", "scaling", "rotation", "normal", "uv"],
+        uniforms: ["world", "worldView", "worldViewProjection", "view", "projection",
+                   "myColor", "uPositions", "uRotations", "uScales", "uActiveCount"
+        ]
+      });
+
+
+
+function getLhsPositionsAndRotations(currentNode) {
+  let lhs = currentNode;
+  let lhsPositions = new Float32Array(16 * 3);//[];
+  let lhsRotations = new Float32Array(16 * 3);//[];
+  let lhsScalings = new Float32Array(16 * 3);//[];
+
+  for (let i=0; i < lhsPositions.length; i++) {
+    lhsPositions[i] = 0.0;
+    lhsRotations[i] = 0.0;
+    lhsScalings[i] = 0.0;
+  }
+
+  let i = -1;
+  while (++i >= 0 && lhs && lhs && lhs.translate) {
+    lhsPositions[i * 3 + 0] = lhs.translate.x + 0.0;
+    lhsPositions[i * 3 + 1] = lhs.translate.y + 0.0;
+    lhsPositions[i * 3 + 2] = lhs.translate.z + 0.0;
+
+    lhsRotations[i * 3 + 0] = lhs.rotate.x + 0.0;
+    lhsRotations[i * 3 + 1] = lhs.rotate.y + 0.0;
+    lhsRotations[i * 3 + 2] = lhs.rotate.z + 0.0;
+
+
+    lhsScalings[i * 3 + 0] = lhs.scale.x + 0.0;
+    lhsScalings[i * 3 + 1] = lhs.scale.y + 0.0;
+    lhsScalings[i * 3 + 2] = lhs.scale.z + 0.0;
+
+    lhs = lhs.lhs;
+  }
+
+  return { positions: lhsPositions, rotations: lhsRotations, len: i, scales: lhsScalings };
+}
+
+function newItemOrBox(node, name, id, object, scene, color='#FFFFFF') {
+  let item;
+  let state = "None";
+  let material = duplicateShaderMaterial(node, id, color);
+
+  item = BABYLON.Mesh.CreateBox(name + id, id, scene);
+
+  item.material = material;
+
+  return item;// box/item when done.
+}
+
+function duplicateShaderMaterial(node, id, color = '#ffffff') {
+    let itemColor = hexToRgb(color);
+
+  let material = shaderMaterial.clone(node.name + id);
+
+  material.backFaceCulling = true;
+  material.setVector3("myColor", new BABYLON.Vector3(itemColor.r / 255, itemColor.g / 255, itemColor.b / 255));
+
+  let lhs = getLhsPositionsAndRotations(node);
+  material.setArray3("uPositions", lhs.positions);
+  material.setArray3("uRotations", lhs.rotations);
+  material.setArray3("uScales", lhs.scales);
+  material.setInt("uActiveCount", lhs.len);
+
+  return material;
+
+}
+
+// example:
+let boxParent = newItemOrBox(boxItemParent, "any-thing", "any-2", boxItemParent, scene, '#FFFF00')
+let box = newItemOrBox(boxItem, "any", "any-1", boxItem, scene, '#FFFFFF')
