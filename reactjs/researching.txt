@@ -1,0 +1,77 @@
+Investigative Question:
+    Investigating the key differences and similarities between reactjs, angular and extjs
+    to critically realign my current skills for reactjs.
+
+# First prompt:
+    "differences and similarities between reactjs, angular and extjs"
+    
+    Results:
+        # See ./results/1._differences-similarities.txt here
+
+    New questions:
+        UI framework means importing library requirements in the html?
+
+        Noting major differences would be:
+            data binding: one-way
+            dom type: virtual (in memory)
+            and ui components: third party dependencies
+            finally what is good practice for structuring reactjs code?
+
+    Newly Noted learnings:
+        A .jsx file is:
+            basically a javascript xml file for react.
+
+            How JSX WorksNot Real HTML: Although it looks like HTML, it is transformed
+                into regular JavaScript (such as React.createElement calls) by tools like Babel before the browser runs it.
+            Embedding Logic: You can put JavaScript variables or math inside your tags
+            by using curly braces {}.
+            Main Rules of JSX
+                Single Root: Every block must have one single parent element (like a <div> or an empty fragment <>).
+                CamelCase Names: HTML attributes use camelCase in JSX, meaning class becomes className and for becomes html For.
+                Closed Tags: All tags must close properly, including self-closing tags like <br /> or <img />.
+
+
+        type="text/babel" 
+            tells an in-browser Babel standalone compiler that it needs to transform modern
+            JavaScript and JSX code into standard, browser-compatible JavaScript
+
+
+# Second prompt:
+    Can you give an example of the differences in:
+    1. bindings between the languages i.e an example of a one-way data binding versus 2 way databinding situations.
+        And then how do we go around not having 2 way binding with the one-way binding solution.
+    2. an example of a virtual versus standard dom and usage example.
+    3. an example of a reactjs third party dependency for its ui components?
+    4. Tell me given react is neither MVC or MVVC but rather a component-based UI library classification,
+        what are the best practices to follow when implementing a reactjs project?
+
+    Results:
+        # see 2._two-way-binding-example.jsx       # i.e its the workaround or technique.
+        # see 3._standard-dom-manipulation.txt     # i.e the workarounds to access the virtual dom items.
+        # see 4._react-third-party-dependancy.txt  # i.e how to include/import components in your solution.
+        # see 5._best_practises_-_reactjs.txt      # i.e how/how-not to write a reactjs program.
+
+    New Questions:
+        In react - <using the Good Practises breakdown here> how do we:
+            Write modular/reusable components?
+            Handle authentication?
+            Handle routing to different pages?
+            Retreive and send data to the backend (and securely)?
+            Use global state managers (i.e redux, context or other).
+
+# Third prompt:
+    <this research section coming soon...>
+
+BONUS TODO:
+    After the baseline research, build a react application that:
+        - integrates an external component:
+            - like a babylonJS window
+            - or a vsCode integrated window
+            - and/or pay gateway? And item cart?
+        - does basic account creation for a SaaS tenancy.
+        - does basic auth login to the backend.
+        - handles a baseline contact us form and submission.
+        - <Then we can decide what SaaS/product/service we're selling - i.e solution agnostic>
+
+        - Allow the backend to be tech-stack neutral i.e any backend obeying CORS policies should work with it (modular).
+
