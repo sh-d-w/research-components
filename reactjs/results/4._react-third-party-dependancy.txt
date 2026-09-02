@@ -1,0 +1,24 @@
+
+
+Because React does not include pre-styled inputs, buttons, grids, or menus, you must install an external library.
+One of the most popular third-party choices is MUI (Material UI), which implements Google's Material Design.
+
+To use a specialized component like a Date Picker in React, you would run:
+
+    npm install @mui/material @mui/x-date-pickers
+
+
+Then you import it into your file:
+
+    import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+    import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+    import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+
+    function App() {
+    return (
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+        {/* Fully styled, responsive, accessible calendar popup out-of-the-box */}
+        <DatePicker label="Select Date" />
+        </LocalizationProvider>
+    );
+    }

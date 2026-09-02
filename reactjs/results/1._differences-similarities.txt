@@ -1,0 +1,9 @@
+Feature | ReactJS | Angular | Ext JS
+Core Nature | UI Library | Full Framework | Complete Enterprise Platform
+Data Binding | One-way (unidirectional) | Two-way & One-way | Two-way (via MVVM/Data binding)
+DOM Type | Virtual DOM | Standard DOM (Optimized w/ Signals) | Standard DOM (Heavy component layout)
+Language | JavaScript or TypeScript | Strictly TypeScript | Plain JavaScript / ES6 classes
+UI Components | Third-party dependencies | Third-party or Angular Material | 140+ Pre-built, native enterprise components
+Licensing | Open-source (MIT) | Open-source (MIT) | Commercial / Proprietary
+Primary Backer | Meta (Facebook) | Google | Idera (Sencha)
+

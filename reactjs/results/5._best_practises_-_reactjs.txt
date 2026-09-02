@@ -1,0 +1,36 @@
+4. Best Practices for ReactJS Architecture
+    Without the guardrails of MVC or MVVM, React projects can easily become messy ("spaghetti code").
+    To keep your code clean, scalable, and maintainable, adopt the following best practices:
+    
+    Separation of Concerns (Container vs. Presentational Components):
+        Split components into two categories:
+            those that handle data fetching/logic (Containers) and
+            those that just accept props and display the UI (Presentational).
+        This keeps your UI easily testable and reusable.
+
+    Follow a Strict Folder Structure:
+        Organize files by feature rather than file type. Instead of having separate global components/
+        and hooks/ folders, group them logically:
+
+        src/
+        └── features/
+            └── authentication/
+                ├── AuthForm.jsx
+                ├── useAuth.js
+                └── authStyles.css
+
+
+        Keep State Localized (Lift State Up Only When Necessary):
+            Do not throw everything into a global state manager (like Redux or Context).
+                If a dropdown's open/closed state is only relevant to that dropdown, keep it inside that component.
+                Lift it up to a parent component only if sibling components need access to it.
+
+        Master Custom Hooks for Reusable Logic:
+            Never duplicate data-fetching or complex calculations inside multiple components.
+            Extract them into custom hooks to cleanly isolate logic away from the UI.
+        
+        Use "Key" Props Correctly:
+            When rendering lists of elements, always assign a unique, stable identifier (like a database ID)
+            to the key prop. Never use array indexes (index), as this breaks the Virtual DOM diffing process
+            if the list is sorted, filtered, or deleted.Are there specific parts of this workflow—like handling
+            complex forms or choosing a global state manager—that you would like to explore next?
